@@ -1,16 +1,45 @@
-// Login.jsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add your login logic here
-    console.log({ email, password, rememberMe });
+    setError('');
+    setLoading(true);
+    
+    try {
+      const response = await axios.post('/api/auth/signin/', {
+        email,
+        password
+      });
+      
+      // Store tokens in localStorage or sessionStorage based on remember me
+      if (rememberMe) {
+        localStorage.setItem('accessToken', response.data.access);
+        localStorage.setItem('refreshToken', response.data.refresh);
+      } else {
+        sessionStorage.setItem('accessToken', response.data.access);
+        sessionStorage.setItem('refreshToken', response.data.refresh);
+      }
+      
+      // Set authorization header for future requests
+      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
+      
+      // Redirect to home or dashboard
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -38,8 +67,14 @@ const Login = () => {
           </div>
           <div className="text-2xl font-bold text-navy-800">STREAM</div>
           <h2 className="text-2xl font-semibold text-gray-700 mt-6">Welcome Back</h2>
-          <p className="text-gray-500 mt-2">Enter your credential to login</p>
+          <p className="text-gray-500 mt-2">Enter your credentials to login</p>
         </div>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -82,8 +117,9 @@ const Login = () => {
           <button
             type="submit"
             className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition duration-300"
+            disabled={loading}
           >
-            Login
+            {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
         
