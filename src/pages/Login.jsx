@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import popstream from '../assets/pop-stream-blue.png';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -16,25 +16,20 @@ const Login = () => {
     setLoading(true);
     
     try {
-      const response = await axios.post('/api/auth/signin/', {
+      const response = await axios.post('http://127.0.0.1:8000/api/auth/signin/', {
         email,
         password
       });
       
-      // Store tokens in localStorage or sessionStorage based on remember me
-      if (rememberMe) {
         localStorage.setItem('accessToken', response.data.access);
         localStorage.setItem('refreshToken', response.data.refresh);
-      } else {
-        sessionStorage.setItem('accessToken', response.data.access);
-        sessionStorage.setItem('refreshToken', response.data.refresh);
-      }
+        localStorage.setItem('email', email);
       
       // Set authorization header for future requests
       axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
       
-      // Redirect to home or dashboard
-      navigate('/dashboard');
+      // Redirect to home 
+      navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
@@ -43,30 +38,16 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 via-purple-200 to-pink-100">
-      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="bg-gradient-to-b from-pink-100 via-pink-200 to-pink-100 rounded-lg shadow-xl px-8 py-2 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-2">
-            <div className="text-4xl font-bold">
-              <span className="text-navy-800">P</span>
-              <span className="inline-block">
-                <svg className="w-10 h-10" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="25" cy="25" r="20" fill="url(#pop-gradient)" />
-                  <path d="M15,25 Q25,10 35,25 Q25,40 15,25" fill="#fff" />
-                  <defs>
-                    <linearGradient id="pop-gradient" x1="0" y1="0" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#9333ea" />
-                      <stop offset="50%" stopColor="#3b82f6" />
-                      <stop offset="100%" stopColor="#ec4899" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </span>
-              <span className="text-navy-800">P</span>
+            <div className="w-32">
+              <img src={popstream} alt="" />
             </div>
           </div>
-          <div className="text-2xl font-bold text-navy-800">STREAM</div>
-          <h2 className="text-2xl font-semibold text-gray-700 mt-6">Welcome Back</h2>
+
+          <h2 className="text-2xl font-semibold text-gray-700 mt-2">Welcome Back</h2>
           <p className="text-gray-500 mt-2">Enter your credentials to login</p>
         </div>
 
@@ -101,18 +82,7 @@ const Login = () => {
             />
           </div>
           
-          <div className="flex items-center mb-6">
-            <input
-              type="checkbox"
-              id="remember"
-              className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-            />
-            <label htmlFor="remember" className="ml-2 block text-sm text-gray-700">
-              Remember Me
-            </label>
-          </div>
+
           
           <button
             type="submit"

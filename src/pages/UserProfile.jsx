@@ -6,6 +6,10 @@ const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [updateMessage, setUpdateMessage] = useState('');
+  const [updateStatus, setUpdateStatus] = useState(''); // 'success' or 'error'
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,10 +24,11 @@ const UserProfile = () => {
     // Get user data
     const fetchUserData = async () => {
       try {
-        const response = await axios.get('/api/auth/user/', {
-          headers: { Authorization: `Bearer ${token}` }
+        const response = await axios.post('http://127.0.0.1:8000/api/auth/user/get-by-email/', {
+          email: localStorage.getItem('email') || sessionStorage.getItem('email')
         });
         setUser(response.data);
+        setNewUsername(response.data.username); // Initialize the edit field with current username
       } catch (err) {
         if (err.response?.status === 401) {
           navigate('/login', { state: { message: 'Session expired. Please login again.' } });
@@ -43,7 +48,7 @@ const UserProfile = () => {
     const refreshToken = localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken');
     
     try {
-      await axios.post('/api/auth/signout/', {
+      await axios.post('http://127.0.0.1:8000/api/auth/signout/', {
         refresh_token: refreshToken
       }, {
         headers: { Authorization: `Bearer ${token}` }
@@ -52,8 +57,10 @@ const UserProfile = () => {
       // Clear tokens from storage
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('email');
       sessionStorage.removeItem('accessToken');
       sessionStorage.removeItem('refreshToken');
+      sessionStorage.removeItem('email');
       
       navigate('/login', { state: { message: 'You have been signed out successfully' } });
     } catch (err) {
@@ -62,11 +69,65 @@ const UserProfile = () => {
       // Even if API call fails, clear tokens and redirect
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('email');
       sessionStorage.removeItem('accessToken');
       sessionStorage.removeItem('refreshToken');
+      sessionStorage.removeItem('email');
       
       navigate('/login');
     }
+  };
+
+  const handleUpdateUsername = async () => {
+    // If not in edit mode, switch to edit mode
+    if (!isEditingUsername) {
+      setIsEditingUsername(true);
+      return;
+    }
+
+    // Proceed with update if username changed
+    if (newUsername === user.username) {
+      setIsEditingUsername(false);
+      return;
+    }
+
+    const token = localStorage.getItem('accessToken') ;
+    
+    try {
+      // Clear any previous messages
+      setUpdateMessage('');
+      setUpdateStatus('');
+
+      const response = await axios.patch(
+        'http://127.0.0.1:8000/api/auth/user/update-username/',
+        { username: newUsername },
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
+
+      // Update the user state with the new username
+      setUser({
+        ...user,
+        username: newUsername
+      });
+      
+      setUpdateMessage('Username updated successfully!');
+      setUpdateStatus('success');
+      setIsEditingUsername(false);
+      
+      // Timeout to clear the success message after 3 seconds
+      setTimeout(() => {
+        setUpdateMessage('');
+        setUpdateStatus('');
+      }, 3000);
+    } catch (err) {
+      setUpdateMessage(err.response?.data?.error || 'Failed to update username');
+      setUpdateStatus('error');
+    }
+  };
+
+  const cancelUsernameEdit = () => {
+    setNewUsername(user.username); // Reset to the current username
+    setIsEditingUsername(false);
   };
 
   return (
@@ -132,7 +193,7 @@ const UserProfile = () => {
                   <div className="h-24 w-24 rounded-full bg-white flex items-center justify-center text-3xl font-bold text-purple-500 border-4 border-white shadow-lg">
                     {user.username && user.username[0].toUpperCase()}
                   </div>
-                  <div className="mt-4 sm:mt-0 sm:ml-6 text-center sm:text-left">
+                  <div className="mt-4 sm:mt-0I sm:ml-6 text-center sm:text-left">
                     <h1 className="text-2xl font-bold text-white">{user.username}</h1>
                     <p className="text-purple-100">{user.email}</p>
                   </div>
@@ -143,19 +204,60 @@ const UserProfile = () => {
               <div className="px-6 py-8 sm:px-10">
                 <h2 className="text-xl font-semibold text-gray-800 mb-6">Account Information</h2>
                 
+                {/* Update Message Display */}
+                {updateMessage && (
+                  <div className={`mb-4 p-3 rounded-lg ${
+                    updateStatus === 'success' 
+                      ? 'bg-green-100 border border-green-400 text-green-700' 
+                      : 'bg-red-100 border border-red-400 text-red-700'
+                  }`}>
+                    {updateMessage}
+                  </div>
+                )}
+                
                 <div className="space-y-6">
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="flex justify-between items-center">
-                      <div>
+                      <div className={isEditingUsername ? "w-full" : ""}>
                         <h3 className="text-sm font-medium text-gray-500">Username</h3>
-                        <p className="text-base font-medium text-gray-900 mt-1">{user.username}</p>
+                        
+                        {isEditingUsername ? (
+                          <div className="mt-1 flex flex-col sm:flex-row sm:items-center sm:space-x-2">
+                            <input
+                              type="text"
+                              value={newUsername}
+                              onChange={(e) => setNewUsername(e.target.value)}
+                              className="flex-grow px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                              placeholder="Enter new username"
+                            />
+                            <div className="flex space-x-2 mt-2 sm:mt-0">
+                              <button
+                                onClick={handleUpdateUsername}
+                                className="px-3 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 text-sm"
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={cancelUsernameEdit}
+                                className="px-3 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 text-sm"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-base font-medium text-gray-900 mt-1">{user.username}</p>
+                        )}
                       </div>
-                      <Link
-                        to="/update-username"
-                        className="text-sm font-medium text-purple-600 hover:text-purple-800"
-                      >
-                        Edit
-                      </Link>
+                      
+                      {!isEditingUsername && (
+                        <button
+                          onClick={handleUpdateUsername}
+                          className="text-sm font-medium text-purple-600 hover:text-purple-800"
+                        >
+                          Edit
+                        </button>
+                      )}
                     </div>
                   </div>
                   

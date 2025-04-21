@@ -1,31 +1,52 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import popstream from '../assets/pop-stream-blue.png';
+import axios from 'axios';
 
-const Home = ({ isAuthenticated }) => {
+const Home = () => {
+  const token = localStorage.getItem('accessToken') ;
+  const isAuthenticated = token;
+  const [subscription, setSubscription] = useState('free');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      axios.get('http://127.0.0.1:8000/s/subscription_type/', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        }
+      })
+      .then(response => {
+        console.log(response.data);
+        setSubscription(response.data.subscription_type);
+      })
+      .catch(error => {
+        console.error('Error fetching subscription:', error);
+      });
+    }
+  }, [isAuthenticated]);
+
+  const handleUpgrade = (plan) => {
+    if (!isAuthenticated) {
+      navigate('/signup');
+      return;
+    }
+
+    navigate(`/subscription/checkout?plan=${plan}`);
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-purple-100 via-purple-200 to-pink-100">
+    <div className="min-h-screen flex flex-col bg-white">
       {/* Header/Navigation */}
       <nav className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <div className="text-2xl font-bold">
-                  <span className="text-navy-800">P</span>
-                  <span className="inline-block">
-                    <svg className="w-6 h-6" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="25" cy="25" r="20" fill="url(#pop-gradient)" />
-                      <path d="M15,25 Q25,10 35,25 Q25,40 15,25" fill="#fff" />
-                      <defs>
-                        <linearGradient id="pop-gradient" x1="0" y1="0" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#9333ea" />
-                          <stop offset="50%" stopColor="#3b82f6" />
-                          <stop offset="100%" stopColor="#ec4899" />
-                        </linearGradient>
-                      </defs>
-                    </svg>
-                  </span>
-                  <span className="text-navy-800">P STREAM</span>
+                <div className="flex items-center">
+                  <div className="w-24">
+                    <img src={popstream} alt="POP STREAM" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -38,6 +59,7 @@ const Home = ({ isAuthenticated }) => {
                   >
                     My Profile
                   </Link>
+                  
                 </>
               ) : (
                 <>
@@ -61,132 +83,230 @@ const Home = ({ isAuthenticated }) => {
       </nav>
 
       {/* Hero Section */}
-      <div className="flex-grow flex items-center">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+      <div className="bg-gradient-to-b from-pink-100 via-pink-200 to-pink-100 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 tracking-tight">
             Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">POP STREAM</span>
           </h1>
           <p className="mt-6 text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto">
-            Your ultimate entertainment platform for streaming your favorite content
+            Choose the perfect subscription plan for your entertainment needs
           </p>
-          <div className="mt-10">
-            {isAuthenticated ? (
-              <Link
-                to="/profile"
-                className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 md:py-4 md:text-lg md:px-10 shadow-lg"
-              >
-                Go to Profile
-              </Link>
-            ) : (
-              <div className="space-x-4">
-                <Link
-                  to="/signup"
-                  className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 md:py-4 md:text-lg md:px-10 shadow-lg"
-                >
-                  Get Started
-                </Link>
-                <Link
-                  to="/login"
-                  className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-purple-700 bg-purple-100 hover:bg-purple-200 md:py-4 md:text-lg md:px-10"
-                >
-                  Sign In
-                </Link>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
-      {/* Features Section (optional) */}
-      <div className="bg-white py-12">
+      {/* Subscription Plans Section */}
+      <div className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
+          <div className="text-center mb-10">
             <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-              Discover Amazing Features
+              Subscription Plans
             </h2>
             <p className="mt-4 max-w-2xl text-xl text-gray-500 mx-auto">
-              Everything you need to enjoy your streaming experience
+              Select the plan that works best for you
             </p>
           </div>
 
           <div className="mt-10">
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {/* Feature 1 */}
-              <div className="pt-6">
-                <div className="flow-root bg-gray-50 rounded-lg px-6 pb-8">
-                  <div className="-mt-6">
-                    <div>
-                      <span className="inline-flex items-center justify-center p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-md shadow-lg">
-                        <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.91 11.672a.375.375 0 010 .656l-5.603 3.113a.375.375 0 01-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112z" />
-                        </svg>
+              {/* Free Plan */}
+              <div className={`border ${subscription === 'free' ? 'border-green-400' : 'border-gray-200'} rounded-lg shadow-sm p-6 bg-white hover:shadow-lg transition-shadow duration-300`}>
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-gray-900">FREE</h3>
+                  <div className="mt-4 flex justify-center">
+                    <span className="text-5xl font-extrabold text-purple-600">$0</span>
+                    <span className="ml-1 text-xl font-medium text-gray-500 self-end mb-1">/ mth</span>
+                  </div>
+                  <ul className="mt-6 space-y-4 text-left">
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>Basic features for small needs</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>Watermark</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>PopStream banner repetition</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>1 Aruco</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>Single playlist with 3 images</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>Static images (jpg, png)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>640x480 resolution</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>Bug fixes only</span>
+                    </li>
+                  </ul>
+                  <div className="mt-8">
+                    {subscription === 'free' ? (
+                      <span className="inline-block px-4 py-2 text-green-600 font-medium bg-green-100 rounded-full">
+                        Current Plan
                       </span>
-                    </div>
-                    <h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">High-Quality Streaming</h3>
-                    <p className="mt-2 text-base text-gray-500">
-                      Enjoy crystal clear video quality with our advanced streaming technology.
-                    </p>
+                    ) : (
+                      <button
+                        className="w-full px-4 py-2 text-gray-600 font-medium bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-300"
+                        onClick={() => alert("You're already subscribed to a higher plan")}
+                      >
+                        Downgrade
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
 
-              {/* Feature 2 */}
-              <div className="pt-6">
-                <div className="flow-root bg-gray-50 rounded-lg px-6 pb-8">
-                  <div className="-mt-6">
-                    <div>
-                      <span className="inline-flex items-center justify-center p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-md shadow-lg">
-                        <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
+              {/* Standard Plan */}
+              <div className={`border ${subscription === 'basic' ? 'border-green-400' : 'border-purple-200'} rounded-lg shadow-sm p-6 bg-white hover:shadow-lg transition-shadow duration-300`}>
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-gray-900">STANDARD</h3>
+                  <div className="mt-4 flex justify-center">
+                    <span className="text-5xl font-extrabold text-purple-600">$4.99</span>
+                    <span className="ml-1 text-xl font-medium text-gray-500 self-end mb-1">/ mth</span>
+                  </div>
+                  <ul className="mt-6 space-y-4 text-left">
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>Ideal for small businesses</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>No watermark, no banner</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>2 Aruco markers</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>3 playlists, each with 3 images</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>Static/animated images (jpg, png, gif)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>720p resolution</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>Bug fixes & new features</span>
+                    </li>
+                  </ul>
+                  <div className="mt-8">
+                    {subscription === 'basic' ? (
+                      <span className="inline-block px-4 py-2 text-green-600 font-medium bg-green-100 rounded-full">
+                        Current Plan
                       </span>
-                    </div>
-                    <h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">User-Friendly Interface</h3>
-                    <p className="mt-2 text-base text-gray-500">
-                      Navigate easily through our intuitive and responsive design.
-                    </p>
+                    ) : subscription === 'pro' ? (
+                      <button
+                        className="w-full px-4 py-2 text-gray-600 font-medium bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-300"
+                        onClick={() => alert("You're already subscribed to a higher plan")}
+                      >
+                        Downgrade
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleUpgrade('basic')}
+                        className="block w-full px-4 py-2 text-white font-medium bg-purple-600 rounded-md hover:bg-purple-700 transition-colors duration-300"
+                      >
+                        Upgrade Now
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
 
-              {/* Feature 3 */}
-              <div className="pt-6">
-                <div className="flow-root bg-gray-50 rounded-lg px-6 pb-8">
-                  <div className="-mt-6">
-                    <div>
-                      <span className="inline-flex items-center justify-center p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-md shadow-lg">
-                        <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
+              {/* Pro Plan */}
+              <div className={`border ${subscription === 'pro' ? 'border-green-400' : 'border-purple-300'} rounded-lg shadow-md p-6 bg-gradient-to-b from-white to-purple-50 hover:shadow-xl transition-shadow duration-300`}>
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-gray-900">PRO</h3>
+                  <div className="mt-4 flex justify-center">
+                    <span className="text-5xl font-extrabold text-purple-600">$9.99</span>
+                    <span className="ml-1 text-xl font-medium text-gray-500 self-end mb-1">/ mth</span>
+                  </div>
+                  <ul className="mt-6 space-y-4 text-left">
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>For advanced users</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>No watermark, no banner</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>2+ Aruco markers</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>Unlimited playlists & images</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>Static/animated images (jpg, png, webp, gif)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>Full HD resolution</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-600 mr-2">•</span>
+                      <span>Bug fixes & new features</span>
+                    </li>
+                  </ul>
+                  <div className="mt-8">
+                    {subscription === 'pro' ? (
+                      <span className="inline-block px-4 py-2 text-green-600 font-medium bg-green-100 rounded-full">
+                        Current Plan
                       </span>
-                    </div>
-                    <h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">Secure Authentication</h3>
-                    <p className="mt-2 text-base text-gray-500">
-                      Your account is protected with state-of-the-art security features.
-                    </p>
+                    ) : (
+                      <button
+                        onClick={() => handleUpgrade('pro')}
+                        className="block w-full px-4 py-2 text-white font-medium bg-gradient-to-r from-purple-500 to-pink-500 rounded-md hover:from-purple-600 hover:to-pink-600 transition-colors duration-300"
+                      >
+                        Upgrade Now
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
           </div>
+          
+          <div className="mt-10 text-center">
+            <Link
+              to={isAuthenticated ? "/" : "/signup"}
+              className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 md:py-4 md:text-lg md:px-10 shadow-lg"
+            >
+              {isAuthenticated ? "Go to Home" : "Get Started"}
+            </Link>
+          </div>
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-white py-12">
+      <footer className="bg-gray-800 text-white py-12 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="md:flex md:items-center md:justify-between">
             <div className="flex justify-center md:justify-start">
-              <div className="text-2xl font-bold">
-                <span>P</span>
-                <span className="inline-block">
-                  <svg className="w-6 h-6" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="25" cy="25" r="20" fill="white" />
-                    <path d="M15,25 Q25,10 35,25 Q25,40 15,25" fill="#4F46E5" />
-                  </svg>
-                </span>
-                <span>P STREAM</span>
+              <div className="flex items-center">
+                <div className="w-8">
+                  <img src={popstream} alt="POP STREAM" className="filter brightness-0 invert" />
+                </div>
+                <span className="ml-2 text-xl font-bold">POP STREAM</span>
               </div>
             </div>
             <div className="mt-8 md:mt-0">
