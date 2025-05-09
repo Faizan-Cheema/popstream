@@ -5,16 +5,17 @@ import popstream from '../assets/pop-stream-blue.png';
 
 const SubscriptionCheckout = () => {
   const [searchParams] = useSearchParams();
-  const plan = searchParams.get('plan');
+  const planId = searchParams.get('plan');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   
-  // Plan details
+  // Plan details with updated pricing
   const planDetails = {
-    basic: {
-      name: 'STANDARD',
-      price: '$4.99',
+    standard_monthly: {
+      name: 'STANDARD MONTHLY',
+      price: '$6.99',
+      billingPeriod: 'Monthly (auto-renews until canceled)',
       features: [
         'Ideal for small businesses',
         'No watermark, no banner',
@@ -25,9 +26,40 @@ const SubscriptionCheckout = () => {
         'Bug fixes & new features'
       ]
     },
-    pro: {
-      name: 'PRO',
-      price: '$9.99',
+    pro_monthly: {
+      name: 'PRO MONTHLY',
+      price: '$12.99',
+      billingPeriod: 'Monthly (auto-renews until canceled)',
+      features: [
+        'For advanced users',
+        'No watermark, no banner',
+        '2+ Aruco markers',
+        'Unlimited playlists & images',
+        'Static/animated images (jpg, png, webp, gif)',
+        'Full HD resolution',
+        'Bug fixes & new features'
+      ]
+    },
+    standard_yearly: {
+      name: 'STANDARD YEARLY',
+      price: '$59.88',
+      billingPeriod: 'Yearly (auto-renews until canceled)',
+      savingsPercent: '29%',
+      features: [
+        'Ideal for small businesses',
+        'No watermark, no banner',
+        '2 Aruco markers',
+        '3 playlists, each with 3 images',
+        'Static/animated images (jpg, png, gif)',
+        '720p resolution',
+        'Bug fixes & new features'
+      ]
+    },
+    pro_yearly: {
+      name: 'PRO YEARLY',
+      price: '$119.88',
+      billingPeriod: 'Yearly (auto-renews until canceled)',
+      savingsPercent: '23%',
       features: [
         'For advanced users',
         'No watermark, no banner',
@@ -42,10 +74,10 @@ const SubscriptionCheckout = () => {
 
   // Validate that we have a valid plan
   useEffect(() => {
-    if (!plan || !['basic', 'pro'].includes(plan)) {
+    if (!planId || !Object.keys(planDetails).includes(planId)) {
       setError('Invalid subscription plan selected');
     }
-  }, [plan]);
+  }, [planId]);
 
   const handleCheckout = async () => {
     setLoading(true);
@@ -58,7 +90,7 @@ const SubscriptionCheckout = () => {
         return;
       }
       
-      const response = await axios.get(`http://127.0.0.1:8000/s/checkout/?plan=${plan}`, {
+      const response = await axios.get(`https://popstream.pythonanywhere.com/s/checkout/?plan=${planId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -82,7 +114,7 @@ const SubscriptionCheckout = () => {
   };
 
   // If no valid plan is selected
-  if (!plan || !planDetails[plan]) {
+  if (!planId || !planDetails[planId]) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
         <div className="flex-grow flex items-center justify-center">
@@ -103,7 +135,9 @@ const SubscriptionCheckout = () => {
     );
   }
 
-  const selectedPlan = planDetails[plan];
+  const selectedPlan = planDetails[planId];
+  const isPro = planId.startsWith('pro');
+  const isYearly = planId.endsWith('yearly');
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -146,10 +180,21 @@ const SubscriptionCheckout = () => {
                 <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                   <dt className="text-sm font-medium text-gray-500">Subscription Price</dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    <span className="font-bold">{selectedPlan.price}</span> per month
+                    <span className="font-bold">{selectedPlan.price}</span>
+                    {isYearly && (
+                      <span className="ml-2 px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                        Save {selectedPlan.savingsPercent}
+                      </span>
+                    )}
                   </dd>
                 </div>
                 <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <dt className="text-sm font-medium text-gray-500">Billing Period</dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    {selectedPlan.billingPeriod}
+                  </dd>
+                </div>
+                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                   <dt className="text-sm font-medium text-gray-500">Features</dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                     <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
@@ -164,12 +209,6 @@ const SubscriptionCheckout = () => {
                         </li>
                       ))}
                     </ul>
-                  </dd>
-                </div>
-                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Billing Period</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    Monthly (auto-renews until canceled)
                   </dd>
                 </div>
               </dl>
@@ -221,7 +260,7 @@ const SubscriptionCheckout = () => {
             <button
               type="button"
               className={`${
-                plan === 'pro' 
+                isPro 
                   ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600' 
                   : 'bg-purple-600 hover:bg-purple-700'
               } py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500`}

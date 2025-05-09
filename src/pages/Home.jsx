@@ -4,14 +4,15 @@ import popstream from '../assets/pop-stream-blue.png';
 import axios from 'axios';
 
 const Home = () => {
-  const token = localStorage.getItem('accessToken') ;
-  const isAuthenticated = token;
+  const token = localStorage.getItem('accessToken');
+  const isAuthenticated = !!token;
   const [subscription, setSubscription] = useState('free');
+  const [planType, setPlanType] = useState('monthly'); // Add state for plan type (monthly/yearly)
   const navigate = useNavigate();
 
   useEffect(() => {
     if (isAuthenticated) {
-      axios.get('http://127.0.0.1:8000/s/subscription_type/', {
+      axios.get('https://popstream.pythonanywhere.com/s/subscription_type/', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
         }
@@ -28,11 +29,16 @@ const Home = () => {
 
   const handleUpgrade = (plan) => {
     if (!isAuthenticated) {
-      navigate('/signup');
+      navigate('/login');
       return;
     }
 
     navigate(`/subscription/checkout?plan=${plan}`);
+  };
+
+  // Function to toggle between monthly and yearly plans
+  const togglePlanType = (type) => {
+    setPlanType(type);
   };
 
   return (
@@ -59,7 +65,6 @@ const Home = () => {
                   >
                     My Profile
                   </Link>
-                  
                 </>
               ) : (
                 <>
@@ -106,193 +111,425 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="mt-10">
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {/* Free Plan */}
-              <div className={`border ${subscription === 'free' ? 'border-green-400' : 'border-gray-200'} rounded-lg shadow-sm p-6 bg-white hover:shadow-lg transition-shadow duration-300`}>
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-gray-900">FREE</h3>
-                  <div className="mt-4 flex justify-center">
-                    <span className="text-5xl font-extrabold text-purple-600">$0</span>
-                    <span className="ml-1 text-xl font-medium text-gray-500 self-end mb-1">/ mth</span>
-                  </div>
-                  <ul className="mt-6 space-y-4 text-left">
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>Basic features for small needs</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>Watermark</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>PopStream banner repetition</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>1 Aruco</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>Single playlist with 3 images</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>Static images (jpg, png)</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>640x480 resolution</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>Bug fixes only</span>
-                    </li>
-                  </ul>
-                  <div className="mt-8">
-                    {subscription === 'free' ? (
-                      <span className="inline-block px-4 py-2 text-green-600 font-medium bg-green-100 rounded-full">
-                        Current Plan
-                      </span>
-                    ) : (
-                      <button
-                        className="w-full px-4 py-2 text-gray-600 font-medium bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-300"
-                        onClick={() => alert("You're already subscribed to a higher plan")}
-                      >
-                        Downgrade
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Standard Plan */}
-              <div className={`border ${subscription === 'basic' ? 'border-green-400' : 'border-purple-200'} rounded-lg shadow-sm p-6 bg-white hover:shadow-lg transition-shadow duration-300`}>
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-gray-900">STANDARD</h3>
-                  <div className="mt-4 flex justify-center">
-                    <span className="text-5xl font-extrabold text-purple-600">$4.99</span>
-                    <span className="ml-1 text-xl font-medium text-gray-500 self-end mb-1">/ mth</span>
-                  </div>
-                  <ul className="mt-6 space-y-4 text-left">
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>Ideal for small businesses</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>No watermark, no banner</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>2 Aruco markers</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>3 playlists, each with 3 images</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>Static/animated images (jpg, png, gif)</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>720p resolution</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>Bug fixes & new features</span>
-                    </li>
-                  </ul>
-                  <div className="mt-8">
-                    {subscription === 'basic' ? (
-                      <span className="inline-block px-4 py-2 text-green-600 font-medium bg-green-100 rounded-full">
-                        Current Plan
-                      </span>
-                    ) : subscription === 'pro' ? (
-                      <button
-                        className="w-full px-4 py-2 text-gray-600 font-medium bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-300"
-                        onClick={() => alert("You're already subscribed to a higher plan")}
-                      >
-                        Downgrade
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleUpgrade('basic')}
-                        className="block w-full px-4 py-2 text-white font-medium bg-purple-600 rounded-md hover:bg-purple-700 transition-colors duration-300"
-                      >
-                        Upgrade Now
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Pro Plan */}
-              <div className={`border ${subscription === 'pro' ? 'border-green-400' : 'border-purple-300'} rounded-lg shadow-md p-6 bg-gradient-to-b from-white to-purple-50 hover:shadow-xl transition-shadow duration-300`}>
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-gray-900">PRO</h3>
-                  <div className="mt-4 flex justify-center">
-                    <span className="text-5xl font-extrabold text-purple-600">$9.99</span>
-                    <span className="ml-1 text-xl font-medium text-gray-500 self-end mb-1">/ mth</span>
-                  </div>
-                  <ul className="mt-6 space-y-4 text-left">
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>For advanced users</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>No watermark, no banner</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>2+ Aruco markers</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>Unlimited playlists & images</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>Static/animated images (jpg, png, webp, gif)</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>Full HD resolution</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
-                      <span>Bug fixes & new features</span>
-                    </li>
-                  </ul>
-                  <div className="mt-8">
-                    {subscription === 'pro' ? (
-                      <span className="inline-block px-4 py-2 text-green-600 font-medium bg-green-100 rounded-full">
-                        Current Plan
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => handleUpgrade('pro')}
-                        className="block w-full px-4 py-2 text-white font-medium bg-gradient-to-r from-purple-500 to-pink-500 rounded-md hover:from-purple-600 hover:to-pink-600 transition-colors duration-300"
-                      >
-                        Upgrade Now
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
+          {/* Plan Type Tabs */}
+          <div className="flex justify-center mb-8">
+            <div className="inline-flex rounded-md shadow-sm" role="group">
+              <button 
+                type="button" 
+                className={`px-6 py-2 text-sm font-medium ${planType === 'monthly' ? 
+                  'text-white bg-purple-600' : 
+                  'text-purple-600 bg-white'} border border-purple-600 rounded-l-lg hover:bg-purple-700 hover:text-white focus:z-10 focus:ring-2 focus:ring-purple-500`}
+                onClick={() => togglePlanType('monthly')}
+              >
+                Monthly
+              </button>
+              <button 
+                type="button" 
+                className={`px-6 py-2 text-sm font-medium ${planType === 'yearly' ? 
+                  'text-white bg-purple-600' : 
+                  'text-purple-600 bg-white'} border border-purple-600 rounded-r-lg hover:bg-purple-700 hover:text-white focus:z-10 focus:ring-2 focus:ring-purple-500`}
+                onClick={() => togglePlanType('yearly')}
+              >
+                Yearly (Save up to 29%)
+              </button>
             </div>
+          </div>
+
+          <div className="mt-10">
+            {planType === 'monthly' ? (
+              // Monthly Plans
+              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                {/* Free Plan */}
+                <div className={`border ${isAuthenticated && subscription === 'free' ? 'border-green-400' : 'border-gray-200'} rounded-lg shadow-sm p-6 bg-white hover:shadow-lg transition-shadow duration-300`}>
+                  <div className="text-center">
+                    <h3 className="text-2xl font-bold text-gray-900">FREE</h3>
+                    <div className="mt-4 flex justify-center">
+                      <span className="text-5xl font-extrabold text-purple-600">$0</span>
+                      <span className="ml-1 text-xl font-medium text-gray-500 self-end mb-1">/ mth</span>
+                    </div>
+                    <ul className="mt-6 space-y-4 text-left">
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Basic features for small needs</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Watermark</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>PopStream banner repetition</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>1 Aruco</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Single playlist with 3 images</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Static images (jpg, png)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>640x480 resolution</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Bug fixes only</span>
+                      </li>
+                    </ul>
+                    <div className="mt-8">
+                      {isAuthenticated && subscription === 'free' ? (
+                        <span className="inline-block px-4 py-2 text-green-600 font-medium bg-green-100 rounded-full">
+                          Current Plan
+                        </span>
+                      ) : isAuthenticated ? (
+                        <button
+                          className="w-full px-4 py-2 text-gray-600 font-medium bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-300"
+                          onClick={() => alert("You're already on the free plan")}
+                        >
+                          Free Plan
+                        </button>
+                      ) : (
+                        <Link
+                          to="/signup"
+                          className="block w-full px-4 py-2 text-white font-medium bg-gray-600 rounded-md hover:bg-gray-700 transition-colors duration-300"
+                        >
+                          Get Started
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Standard Plan */}
+                <div className={`border ${isAuthenticated && subscription === 'standard' ? 'border-green-400' : 'border-purple-200'} rounded-lg shadow-sm p-6 bg-white hover:shadow-lg transition-shadow duration-300`}>
+                  <div className="text-center">
+                    <h3 className="text-2xl font-bold text-gray-900">STANDARD</h3>
+                    <div className="mt-4 flex justify-center">
+                      <span className="text-5xl font-extrabold text-purple-600">$6.99</span>
+                      <span className="ml-1 text-xl font-medium text-gray-500 self-end mb-1">/ mth</span>
+                    </div>
+                    <ul className="mt-6 space-y-4 text-left">
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Ideal for small businesses</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>No watermark, no banner</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>2 Aruco markers</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>3 playlists, each with 3 images</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Static/animated images (jpg, png, gif)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>720p resolution</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Bug fixes & new features</span>
+                      </li>
+                    </ul>
+                    <div className="mt-8">
+                      {isAuthenticated && subscription === 'standard' ? (
+                        <span className="inline-block px-4 py-2 text-green-600 font-medium bg-green-100 rounded-full">
+                          Current Plan
+                        </span>
+                      ) : isAuthenticated && subscription === 'pro' ? (
+                        <button
+                          className="w-full px-4 py-2 text-gray-600 font-medium bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-300"
+                          onClick={() => alert("You're already subscribed to a higher plan")}
+                        >
+                          Downgrade
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleUpgrade('standard_monthly')}
+                          className="block w-full px-4 py-2 text-white font-medium bg-purple-600 rounded-md hover:bg-purple-700 transition-colors duration-300"
+                        >
+                          {isAuthenticated ? 'Upgrade Now' : 'Subscribe'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Pro Plan */}
+                <div className={`border ${isAuthenticated && subscription === 'pro' ? 'border-green-400' : 'border-purple-300'} rounded-lg shadow-md p-6 bg-gradient-to-b from-white to-purple-50 hover:shadow-xl transition-shadow duration-300`}>
+                  <div className="text-center">
+                    <h3 className="text-2xl font-bold text-gray-900">PRO</h3>
+                    <div className="mt-4 flex justify-center">
+                      <span className="text-5xl font-extrabold text-purple-600">$12.99</span>
+                      <span className="ml-1 text-xl font-medium text-gray-500 self-end mb-1">/ mth</span>
+                    </div>
+                    <ul className="mt-6 space-y-4 text-left">
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>For advanced users</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>No watermark, no banner</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>2+ Aruco markers</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Unlimited playlists & images</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Static/animated images (jpg, png, webp, gif)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Full HD resolution</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Bug fixes & new features</span>
+                      </li>
+                    </ul>
+                    <div className="mt-8">
+                      {isAuthenticated && subscription === 'pro' ? (
+                        <span className="inline-block px-4 py-2 text-green-600 font-medium bg-green-100 rounded-full">
+                          Current Plan
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => handleUpgrade('pro_monthly')}
+                          className="block w-full px-4 py-2 text-white font-medium bg-gradient-to-r from-purple-500 to-pink-500 rounded-md hover:from-purple-600 hover:to-pink-600 transition-colors duration-300"
+                        >
+                          {isAuthenticated ? 'Upgrade Now' : 'Subscribe'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              // Yearly Plans
+              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                {/* Free Plan */}
+                <div className={`border ${isAuthenticated && subscription === 'free' ? 'border-green-400' : 'border-gray-200'} rounded-lg shadow-sm p-6 bg-white hover:shadow-lg transition-shadow duration-300`}>
+                  <div className="text-center">
+                    <h3 className="text-2xl font-bold text-gray-900">FREE</h3>
+                    <div className="mt-4 flex justify-center">
+                      <span className="text-5xl font-extrabold text-purple-600">$0</span>
+                      <span className="ml-1 text-xl font-medium text-gray-500 self-end mb-1">/ yr</span>
+                    </div>
+                    <ul className="mt-6 space-y-4 text-left">
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Basic features for small needs</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Watermark</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>PopStream banner repetition</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>1 Aruco</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Single playlist with 3 images</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Static images (jpg, png)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>640x480 resolution</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Bug fixes only</span>
+                      </li>
+                    </ul>
+                    <div className="mt-8">
+                      {isAuthenticated && subscription === 'free' ? (
+                        <span className="inline-block px-4 py-2 text-green-600 font-medium bg-green-100 rounded-full">
+                          Current Plan
+                        </span>
+                      ) : isAuthenticated ? (
+                        <button
+                          className="w-full px-4 py-2 text-gray-600 font-medium bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-300"
+                          onClick={() => alert("You're already on the free plan")}
+                        >
+                          Free Plan
+                        </button>
+                      ) : (
+                        <Link
+                          to="/signup"
+                          className="block w-full px-4 py-2 text-white font-medium bg-gray-600 rounded-md hover:bg-gray-700 transition-colors duration-300"
+                        >
+                          Get Started
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Standard Yearly Plan */}
+                <div className={`border ${isAuthenticated && subscription === 'standard_yearly' ? 'border-green-400' : 'border-purple-200'} rounded-lg shadow-sm p-6 bg-white hover:shadow-lg transition-shadow duration-300`}>
+                  <div className="text-center">
+                    <h3 className="text-2xl font-bold text-gray-900">STANDARD</h3>
+                    <div className="mt-4 flex justify-center">
+                      <span className="text-5xl font-extrabold text-purple-600">$59.99</span>
+                      <span className="ml-1 text-xl font-medium text-gray-500 self-end mb-1">/ yr</span>
+                    </div>
+                    <div className="mt-1 text-sm text-green-600 font-medium">
+                      Save $23.89 (28%)
+                    </div>
+                    <ul className="mt-6 space-y-4 text-left">
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Ideal for small businesses</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>No watermark, no banner</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>2 Aruco markers</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>3 playlists, each with 3 images</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Static/animated images (jpg, png, gif)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>720p resolution</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Bug fixes & new features</span>
+                      </li>
+                    </ul>
+                    <div className="mt-8">
+                      {isAuthenticated && subscription === 'standard_yearly' ? (
+                        <span className="inline-block px-4 py-2 text-green-600 font-medium bg-green-100 rounded-full">
+                          Current Plan
+                        </span>
+                      ) : isAuthenticated && (subscription === 'pro' || subscription === 'pro_yearly') ? (
+                        <button
+                          className="w-full px-4 py-2 text-gray-600 font-medium bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-300"
+                          onClick={() => alert("You're already subscribed to a higher plan")}
+                        >
+                          Downgrade
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleUpgrade('standard_yearly')}
+                          className="block w-full px-4 py-2 text-white font-medium bg-purple-600 rounded-md hover:bg-purple-700 transition-colors duration-300"
+                        >
+                          {isAuthenticated ? 'Upgrade Now' : 'Subscribe'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Pro Yearly Plan */}
+                <div className={`border ${isAuthenticated && subscription === 'pro_yearly' ? 'border-green-400' : 'border-purple-300'} rounded-lg shadow-md p-6 bg-gradient-to-b from-white to-purple-50 hover:shadow-xl transition-shadow duration-300`}>
+                  <div className="text-center">
+                    <h3 className="text-2xl font-bold text-gray-900">PRO</h3>
+                    <div className="mt-4 flex justify-center">
+                      <span className="text-5xl font-extrabold text-purple-600">$109.99</span>
+                      <span className="ml-1 text-xl font-medium text-gray-500 self-end mb-1">/ yr</span>
+                    </div>
+                    <div className="mt-1 text-sm text-green-600 font-medium">
+                      Save $45.89 (29%)
+                    </div>
+                    <ul className="mt-6 space-y-4 text-left">
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>For advanced users</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>No watermark, no banner</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>2+ Aruco markers</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Unlimited playlists & images</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Static/animated images (jpg, png, webp, gif)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Full HD resolution</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Bug fixes & new features</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-purple-600 mr-2">•</span>
+                        <span>Priority support</span>
+                      </li>
+                    </ul>
+                    <div className="mt-8">
+                      {isAuthenticated && subscription === 'pro_yearly' ? (
+                        <span className="inline-block px-4 py-2 text-green-600 font-medium bg-green-100 rounded-full">
+                          Current Plan
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => handleUpgrade('pro_yearly')}
+                          className="block w-full px-4 py-2 text-white font-medium bg-gradient-to-r from-purple-500 to-pink-500 rounded-md hover:from-purple-600 hover:to-pink-600 transition-colors duration-300"
+                        >
+                          {isAuthenticated ? 'Upgrade Now' : 'Subscribe'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
           
           <div className="mt-10 text-center">
-            <Link
-              to={isAuthenticated ? "/" : "/signup"}
-              className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 md:py-4 md:text-lg md:px-10 shadow-lg"
-            >
-              {isAuthenticated ? "Go to Home" : "Get Started"}
-            </Link>
+            {!isAuthenticated && (
+              <Link
+                to="/signup"
+                className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 md:py-4 md:text-lg md:px-10 shadow-lg"
+              >
+                Get Started
+              </Link>
+            )}
           </div>
         </div>
       </div>

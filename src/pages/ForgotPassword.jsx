@@ -16,7 +16,7 @@ const ForgotPassword = () => {
     setLoading(true);
     
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/auth/forgot-password/', {
+      const response = await axios.post('https://popstream.pythonanywhere.com/api/auth/forgot-password/', {
         email
       });
       

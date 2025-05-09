@@ -16,22 +16,53 @@ const Login = () => {
     setLoading(true);
     
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/auth/signin/', {
+      // Make sure to use the correct endpoint matching your backend URLs
+      const response = await axios.post('https://popstream.pythonanywhere.com/api/auth/signin/', {
         email,
         password
       });
       
+      // Check if we have both tokens in the response
+      if (response.data.access && response.data.refresh) {
+        // Store tokens and user info
         localStorage.setItem('accessToken', response.data.access);
         localStorage.setItem('refreshToken', response.data.refresh);
         localStorage.setItem('email', email);
-      
-      // Set authorization header for future requests
-      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
-      
-      // Redirect to home 
-      navigate('/');
+        
+        if (response.data.username) {
+          localStorage.setItem('username', response.data.username);
+        }
+        
+        // Set authorization header for future requests
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
+        
+        // Redirect to home 
+        navigate('/');
+      } else {
+        setError('Invalid response from server. Please try again.');
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+      console.error('Login error:', err);
+      
+      // Handle different error response formats
+      if (err.response) {
+        // The backend returned an error response
+        if (err.response.data.detail) {
+          setError(err.response.data.detail);
+        } else if (err.response.data.error) {
+          setError(err.response.data.error);
+        } else if (err.response.data.non_field_errors) {
+          setError(err.response.data.non_field_errors[0]);
+        } else {
+          setError('Invalid credentials. Please try again.');
+        }
+      } else if (err.request) {
+        // No response received from the server
+        setError('No response from server. Please check your connection.');
+      } else {
+        // Something happened in setting up the request
+        setError('Error setting up request. Please try again later.');
+      }
     } finally {
       setLoading(false);
     }
@@ -43,7 +74,7 @@ const Login = () => {
         <div className="text-center mb-8">
           <div className="flex justify-center mb-2">
             <div className="w-32">
-              <img src={popstream} alt="" />
+              <img src={popstream} alt="Pop Stream Logo" />
             </div>
           </div>
 
@@ -81,8 +112,6 @@ const Login = () => {
               required
             />
           </div>
-          
-
           
           <button
             type="submit"

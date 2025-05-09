@@ -22,7 +22,7 @@ const UpdateUsername = () => {
     // Get current user data
     const fetchUserData = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/auth/user/', {
+        const response = await axios.get('https://popstream.pythonanywhere.com/api/auth/user/', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setCurrentUser(response.data);
