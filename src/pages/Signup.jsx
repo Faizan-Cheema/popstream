@@ -101,175 +101,199 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white py-8">
-      <div className="bg-gradient-to-b from-pink-100 via-pink-200 to-pink-100 rounded-lg shadow-xl px-8 py-6 w-full max-w-md">
-        <div className="text-center mb-6">
-          <div className="flex justify-center mb-2">
-            <div className="w-32">
-              <img src={popstream} alt="POP STREAM Logo" />
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-semibold text-gray-700 mt-2">Create Account</h2>
-          <p className="text-gray-500 mt-2">Join POP STREAM today</p>
-        </div>
-
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit}>
-          {/* Profile Picture Section */}
-          <div className="mb-6 flex flex-col items-center">
-            <div 
-              onClick={triggerFileInput}
-              className="w-24 h-24 mb-2 rounded-full bg-gray-100 border-2 border-purple-300 flex items-center justify-center overflow-hidden cursor-pointer hover:border-purple-500 transition-all duration-300 relative"
-            >
-              {profilePreview ? (
-                <>
-                  <img 
-                    src={profilePreview} 
-                    alt="Profile Preview" 
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={removeProfilePicture}
-                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-md hover:bg-red-600 transition-all"
-                  >
-                    ✕
-                  </button>
-                </>
-              ) : (
-                <div className="text-gray-500 text-4xl">+</div>
-              )}
-            </div>
-            <input
-              type="file"
-              id="profilePicture"
-              ref={fileInputRef}
-              className="hidden"
-              onChange={handleFileChange}
-              accept="image/*"
-            />
-            <label htmlFor="profilePicture" className="text-sm text-gray-600 cursor-pointer hover:text-purple-600 transition-all">
-              {profilePreview ? 'Change Picture' : 'Add Profile Picture'}
-            </label>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <input
-                type="text"
-                id="firstName"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
-                placeholder="First Name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <input
-                type="text"
-                id="lastName"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
-                placeholder="Last Name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <input
-              type="text"
-              id="username"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <input
-              type="email"
-              id="email"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <input
-              type="password"
-              id="password"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
-              placeholder="Password (min 8 characters)"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={8}
-            />
-          </div>
-
-          <div className="mb-6">
-            <input
-              type="password"
-              id="confirmPassword"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              minLength={8}
-            />
-          </div>
-
-          <div className="flex items-center mb-6">
-            <input
-              type="checkbox"
-              id="agreeTerms"
-              className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-              checked={agreeTerms}
-              onChange={(e) => setAgreeTerms(e.target.checked)}
-              required
-            />
-            <label htmlFor="agreeTerms" className="ml-2 block text-sm text-gray-700">
-              I agree to the <a href="#" className="text-purple-600 hover:text-purple-800">Terms of Service</a> and <a href="#" className="text-purple-600 hover:text-purple-800">Privacy Policy</a>
-            </label>
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition duration-300"
-            disabled={loading}
-          >
-            {loading ? (
-              <div className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Creating Account...
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#060F33] to-[#061035]">
+      {/* Main Signup Container */}
+      <div className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-md w-full bg-[#070D40] rounded-xl shadow-2xl border border-purple-700 overflow-hidden">
+          {/* Signup Header */}
+          <div className="bg-gradient-to-r from-purple-900 to-[#0B0B4B] px-6 py-8 text-center">
+            <div className="flex justify-center mb-4">
+              <div className="w-32">
+                <img src={popstream} alt="Pop Stream Logo" />
               </div>
-            ) : 'Sign Up'}
-          </button>
-        </form>
+            </div>
+            <h2 className="text-2xl font-bold text-white">Create Account</h2>
+            <p className="text-purple-200 mt-2">Join POP STREAM today</p>
+          </div>
 
-        <div className="text-center mt-6">
-          <span className="text-gray-600 text-sm">Already have an account?</span>
-          <Link to="/login" className="text-purple-600 hover:text-purple-800 text-sm font-medium ml-2">
-            Login
-          </Link>
+          {/* Signup Form */}
+          <div className="px-6 py-8">
+            {error && (
+              <div className="mb-6 p-3 bg-red-900 bg-opacity-30 border border-red-500 text-red-200 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit}>
+              {/* Profile Picture Section */}
+              <div className="mb-6 flex flex-col items-center">
+                <div 
+                  onClick={triggerFileInput}
+                  className="w-24 h-24 mb-2 rounded-full bg-[#0A1144] border-2 border-purple-500 flex items-center justify-center overflow-hidden cursor-pointer hover:border-purple-400 transition-all duration-300 relative"
+                >
+                  {profilePreview ? (
+                    <>
+                      <img 
+                        src={profilePreview} 
+                        alt="Profile Preview" 
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeProfilePicture}
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-md hover:bg-red-600 transition-all"
+                      >
+                        ✕
+                      </button>
+                    </>
+                  ) : (
+                    <div className="text-purple-300 text-4xl">+</div>
+                  )}
+                </div>
+                <input
+                  type="file"
+                  id="profilePicture"
+                  ref={fileInputRef}
+                  className="hidden"
+                  onChange={handleFileChange}
+                  accept="image/*"
+                />
+                <label htmlFor="profilePicture" className="text-sm text-purple-300 cursor-pointer hover:text-purple-200 transition-all">
+                  {profilePreview ? 'Change Picture' : 'Add Profile Picture'}
+                </label>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label htmlFor="firstName" className="block text-sm font-medium text-purple-300 mb-2">
+                    First Name
+                  </label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    className="w-full px-4 py-3 bg-[#0A1144] border border-purple-700 rounded-lg focus:ring-purple-500 focus:border-purple-500 text-white"
+                    placeholder="Enter first name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="lastName" className="block text-sm font-medium text-purple-300 mb-2">
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    className="w-full px-4 py-3 bg-[#0A1144] border border-purple-700 rounded-lg focus:ring-purple-500 focus:border-purple-500 text-white"
+                    placeholder="Enter last name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="mb-4">
+                <label htmlFor="username" className="block text-sm font-medium text-purple-300 mb-2">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  className="w-full px-4 py-3 bg-[#0A1144] border border-purple-700 rounded-lg focus:ring-purple-500 focus:border-purple-500 text-white"
+                  placeholder="Choose a username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="mb-4">
+                <label htmlFor="email" className="block text-sm font-medium text-purple-300 mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  className="w-full px-4 py-3 bg-[#0A1144] border border-purple-700 rounded-lg focus:ring-purple-500 focus:border-purple-500 text-white"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="mb-4">
+                <label htmlFor="password" className="block text-sm font-medium text-purple-300 mb-2">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  className="w-full px-4 py-3 bg-[#0A1144] border border-purple-700 rounded-lg focus:ring-purple-500 focus:border-purple-500 text-white"
+                  placeholder="Min 8 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={8}
+                />
+              </div>
+
+              <div className="mb-6">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-purple-300 mb-2">
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  className="w-full px-4 py-3 bg-[#0A1144] border border-purple-700 rounded-lg focus:ring-purple-500 focus:border-purple-500 text-white"
+                  placeholder="Confirm your password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  minLength={8}
+                />
+              </div>
+
+              <div className="flex items-center mb-6">
+                <input
+                  type="checkbox"
+                  id="agreeTerms"
+                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-purple-700 rounded bg-[#0A1144]"
+                  checked={agreeTerms}
+                  onChange={(e) => setAgreeTerms(e.target.checked)}
+                  required
+                />
+                <label htmlFor="agreeTerms" className="ml-2 block text-sm text-purple-300">
+                  I agree to the <a href="#" className="text-purple-400 hover:text-purple-300">Terms of Service</a> and <a href="#" className="text-purple-400 hover:text-purple-300">Privacy Policy</a>
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white font-medium py-3 px-4 rounded-lg transition duration-300"
+                disabled={loading}
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Creating Account...
+                  </div>
+                ) : 'Sign Up'}
+              </button>
+            </form>
+
+            <div className="text-center mt-6 pt-6 border-t border-purple-800">
+              <span className="text-purple-300 text-sm">Already have an account?</span>
+              <Link to="/login" className="text-purple-400 hover:text-purple-300 text-sm font-medium ml-2">
+                Sign In
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </div>

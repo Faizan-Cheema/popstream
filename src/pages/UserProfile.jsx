@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import popstream from '../assets/pop-stream-blue.png';
 
-
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
@@ -22,6 +21,8 @@ const UserProfile = () => {
   const [updateStatus, setUpdateStatus] = useState('');
   const [profilePicture, setProfilePicture] = useState(null);
   const [profilePicturePreview, setProfilePicturePreview] = useState('');
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -134,17 +135,18 @@ const UserProfile = () => {
         profile_picture: response.data.profile_picture
       }));
 
-      setUpdateMessage('Profile picture updated successfully!');
-      setUpdateStatus('success');
-      setTimeout(() => {
-        setUpdateMessage('');
-        setUpdateStatus('');
-      }, 3000);
+      showNotification('Profile picture updated successfully!');
+      setProfilePicture(null);
     } catch (err) {
       console.error('Error updating profile picture:', err);
-      setUpdateMessage('Failed to update profile picture');
-      setUpdateStatus('error');
+      showNotification('Failed to update profile picture');
     }
+  };
+
+  const showNotification = (message) => {
+    setToastMessage(message);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
   };
 
   const toggleEdit = (field) => {
@@ -206,22 +208,15 @@ const UserProfile = () => {
         localStorage.setItem('username', formData.username);
       }
 
-      setUpdateMessage(`${field === 'firstName' ? 'First name' : field === 'lastName' ? 'Last name' : 'Username'} updated successfully!`);
-      setUpdateStatus('success');
+      showNotification(`${field === 'firstName' ? 'First name' : field === 'lastName' ? 'Last name' : 'Username'} updated successfully!`);
       toggleEdit(field);
-
-      setTimeout(() => {
-        setUpdateMessage('');
-        setUpdateStatus('');
-      }, 3000);
     } catch (err) {
       console.error(`Error updating ${field}:`, err);
       const errorMessage = err.response?.data?.detail ||
         err.response?.data?.error ||
         err.response?.data?.[field === 'firstName' ? 'first_name' : field === 'lastName' ? 'last_name' : 'username']?.[0] ||
         `Failed to update ${field === 'firstName' ? 'first name' : field === 'lastName' ? 'last name' : 'username'}`;
-      setUpdateMessage(errorMessage);
-      setUpdateStatus('error');
+      showNotification(errorMessage);
     }
   };
 
@@ -231,10 +226,10 @@ const UserProfile = () => {
     const isReadOnly = field === 'email';
 
     return (
-      <div className="bg-gray-50 p-4 rounded-lg mb-4 shadow-sm">
+      <div className="bg-[#070D40] border border-purple-800 p-4 rounded-lg mb-4 shadow-md">
         <div className="flex justify-between items-center">
           <div className={isEditing[fieldKey] ? "w-full" : ""}>
-            <label className="block text-sm font-medium text-gray-600 mb-1">{label}</label>
+            <label className="block text-sm font-medium text-purple-300 mb-1">{label}</label>
 
             {isEditing[fieldKey] ? (
               <div className="mt-1 flex flex-col space-y-2">
@@ -243,40 +238,40 @@ const UserProfile = () => {
                   name={fieldKey}
                   value={formValue}
                   onChange={handleInputChange}
-                  className="flex-grow px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  className="flex-grow px-3 py-2 bg-[#0B0B4F] border border-purple-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white"
                   placeholder={placeholder}
                 />
                 <div className="flex space-x-2">
                   <button
                     onClick={() => handleUpdate(fieldKey)}
-                    className="px-3 py-1.5 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 text-sm transition-colors"
+                    className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-md hover:from-purple-700 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 text-sm transition-colors"
                   >
                     Save
                   </button>
                   <button
                     onClick={() => toggleEdit(fieldKey)}
-                    className="px-3 py-1.5 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 text-sm transition-colors"
+                    className="px-3 py-1.5 bg-gray-700 text-gray-200 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 text-sm transition-colors"
                   >
                     Cancel
                   </button>
                 </div>
               </div>
             ) : (
-              <p className="text-base text-gray-800 mt-1">{value || '-'}</p>
+              <p className="text-base text-purple-100 mt-1">{value || '-'}</p>
             )}
           </div>
 
           {!isEditing[fieldKey] && !isReadOnly && (
             <button
               onClick={() => toggleEdit(fieldKey)}
-              className="text-sm font-medium text-purple-600 hover:text-purple-800 transition-colors"
+              className="text-sm font-medium text-purple-400 hover:text-purple-300 transition-colors"
             >
               Edit
             </button>
           )}
 
           {isReadOnly && (
-            <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full">
+            <span className="text-xs bg-[#0B0B4F] text-purple-400 px-2 py-1 rounded-full border border-purple-700">
               Read only
             </span>
           )}
@@ -286,48 +281,58 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <div className="flex items-center">
-            <div className="flex-shrink-0 flex items-center">
-              <div className="flex items-center">
-                <div className="w-24">
-                  <img src={popstream} alt="POP STREAM" />
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#060F33] to-[#061035]">
+      {/* Header/Navigation */}
+      <nav className="bg-[#0B0B4B] shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <div className="flex-shrink-0 flex items-center">
+                <div className="flex items-center">
+                  <a href="https://popstream.net/" className="w-24">
+                    <img src={popstream} alt="POP STREAM" />
+                  </a>
                 </div>
               </div>
             </div>
+            <div className="flex items-center space-x-4">
+              <Link
+                to="/"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-purple-300 bg-purple-900 bg-opacity-30 hover:bg-opacity-50"
+              >
+                Home
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600"
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
-          <button
-            onClick={handleSignOut}
-            className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md hover:from-purple-600 hover:to-pink-600 transition-colors shadow-sm"
-          >
-            Sign Out
-          </button>
         </div>
-      </header >
+      </nav>
 
       {/* Main Content */}
-      < main className="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8" >
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded">
-            <p>{error}</p>
-          </div>
-        )}
+      <main className="flex-grow py-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          {error && (
+            <div className="mb-6 p-4 bg-red-900 bg-opacity-30 border-l-4 border-red-500 text-red-200 rounded">
+              <p>{error}</p>
+            </div>
+          )}
 
-        {
-          loading ? (
+          {loading ? (
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
             </div>
           ) : user ? (
-            <div className="bg-white rounded-xl shadow-md overflow-hidden">
+            <div className="bg-[#070D40] rounded-xl shadow-lg overflow-hidden border border-purple-900">
               {/* Profile Header */}
-              <div className="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-8 sm:px-8 text-center">
+              <div className="bg-gradient-to-r from-purple-600 to-pink-500 px-6 py-8 sm:px-8 text-center">
                 <div className="flex flex-col items-center">
                   <div className="relative group">
-                    <div className="h-32 w-32 rounded-full bg-white flex items-center justify-center text-4xl font-bold text-purple-500 border-4 border-white shadow-lg overflow-hidden">
+                    <div className="h-32 w-32 rounded-full bg-[#0B0B4F] flex items-center justify-center text-4xl font-bold text-purple-300 border-4 border-purple-400 shadow-lg overflow-hidden">
                       {profilePicturePreview ? (
                         <img
                           src={profilePicturePreview}
@@ -337,7 +342,7 @@ const UserProfile = () => {
                       ) : user.username ? (
                         user.username[0].toUpperCase()
                       ) : (
-                        <span className="text-gray-400">?</span>
+                        <span className="text-purple-400">?</span>
                       )}
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -358,7 +363,7 @@ const UserProfile = () => {
                   {profilePicture && (
                     <button
                       onClick={handleUploadProfilePicture}
-                      className="mt-3 px-3 py-1 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700 transition-colors"
+                      className="mt-3 px-3 py-1 bg-purple-800 text-white rounded-md text-sm hover:bg-purple-700 transition-colors"
                     >
                       Save Picture
                     </button>
@@ -374,16 +379,9 @@ const UserProfile = () => {
 
               {/* Profile Content */}
               <div className="px-6 py-6 sm:px-8">
-                <h2 className="text-xl font-semibold text-gray-800 mb-6 pb-2 border-b border-gray-200">Account Information</h2>
-
-                {updateMessage && (
-                  <div className={`mb-6 p-3 rounded-lg ${updateStatus === 'success'
-                    ? 'bg-green-50 border border-green-200 text-green-700'
-                    : 'bg-red-50 border border-red-200 text-red-700'
-                    }`}>
-                    {updateMessage}
-                  </div>
-                )}
+                <h2 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-6 pb-2 border-b border-purple-800">
+                  Account Information
+                </h2>
 
                 <div className="space-y-4">
                   {renderEditableField('First Name', user.first_name, 'first_name', 'Enter first name')}
@@ -391,15 +389,15 @@ const UserProfile = () => {
                   {renderEditableField('Username', user.username, 'username', 'Enter username')}
                   {renderEditableField('Email Address', user.email, 'email', '')}
 
-                  <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+                  <div className="bg-[#070D40] border border-purple-800 p-4 rounded-lg shadow-md">
                     <div className="flex justify-between items-center">
                       <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-1">Password</label>
-                        <p className="text-base text-gray-800">••••••••</p>
+                        <label className="block text-sm font-medium text-purple-300 mb-1">Password</label>
+                        <p className="text-base text-purple-100">••••••••</p>
                       </div>
                       <Link
                         to="/forgot-password"
-                        className="text-sm font-medium text-purple-600 hover:text-purple-800 transition-colors"
+                        className="text-sm font-medium text-purple-400 hover:text-purple-300 transition-colors"
                       >
                         Change Password
                       </Link>
@@ -407,12 +405,46 @@ const UserProfile = () => {
                   </div>
                 </div>
 
+                {/* Subscription Info (if available) */}
+                <div className="mt-8 pt-6 border-t border-purple-800">
+                  <h2 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-4">
+                    Subscription
+                  </h2>
+                  <div className="bg-[#070D40] border border-purple-800 p-4 rounded-lg shadow-md">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <label className="block text-sm font-medium text-purple-300 mb-1">Current Plan</label>
+                        <p className="text-base text-purple-100">
+                          {user.subscription_type ? (
+                            <>
+                              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 font-medium">
+                                {user.subscription_type.charAt(0).toUpperCase() + user.subscription_type.slice(1)}
+                              </span>
+                              {user.subscription_type.includes('yearly') && <span className="ml-2 text-green-400 text-sm">(Yearly)</span>}
+                            </>
+                          ) : (
+                            'Free'
+                          )}
+                        </p>
+                      </div>
+                      <Link
+                        to="/"
+                        className="text-sm font-medium text-purple-400 hover:text-purple-300 transition-colors"
+                      >
+                        Manage Plan
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Account Actions */}
-                <div className="mt-8 pt-6 border-t border-gray-200">
-                  <h2 className="text-xl font-semibold text-gray-800 mb-4">Account Actions</h2>
+                <div className="mt-8 pt-6 border-t border-purple-800">
+                  <h2 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-4">
+                    Account Actions
+                  </h2>
                   <button
                     onClick={handleSignOut}
-                    className="w-full py-2.5 px-4 rounded-lg text-center font-medium text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-sm transition-colors"
+                    className="w-full py-2.5 px-4 rounded-lg text-center font-medium text-white bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 shadow-md transition-colors"
                   >
                     Sign Out
                   </button>
@@ -421,27 +453,47 @@ const UserProfile = () => {
             </div>
           ) : (
             <div className="text-center py-12">
-              <div className="p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-700 rounded mb-6">
+              <div className="p-4 bg-yellow-900 bg-opacity-30 border-l-4 border-yellow-500 text-yellow-300 rounded mb-6">
                 <p>Unable to load profile. Please try again later.</p>
               </div>
               <Link
                 to="/"
-                className="inline-block px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+                className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-md hover:from-purple-700 hover:to-pink-600 transition-colors"
               >
                 Return to Home
               </Link>
             </div>
-          )
-        }
-      </main >
+          )}
+        </div>
+      </main>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed bottom-4 right-4 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg border border-purple-500 flex items-center space-x-2 animate-fade-in-up">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clipRule="evenodd" />
+          </svg>
+          <span>{toastMessage}</span>
+        </div>
+      )}
 
       {/* Footer */}
-      < footer className="bg-white border-t border-gray-200 py-6 mt-8" >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
-          &copy; {new Date().getFullYear()} POP STREAM. All rights reserved.
+      <footer className="bg-[#0B0B4F] text-white py-12 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="md:flex md:items-center md:justify-center">
+            <div className="mt-8 md:mt-0">
+              <p className="text-center md:text-right">
+                &copy; {new Date().getFullYear()} {' '}
+                <a href="https://popstream.net/" className="w-8">
+                  POP STREAM.{' '}
+                </a>
+                All rights reserved.
+              </p>
+            </div>
+          </div>
         </div>
-      </footer >
-    </div >
+      </footer>
+    </div>
   );
 };
 

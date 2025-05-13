@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import popstream from '../assets/pop-stream-blue.png';
 
@@ -37,7 +37,8 @@ const SubscriptionCheckout = () => {
         'Unlimited playlists & images',
         'Static/animated images (jpg, png, webp, gif)',
         'Full HD resolution',
-        'Bug fixes & new features'
+        'Bug fixes & new features',
+        'Priority support'
       ]
     },
     standard_yearly: {
@@ -67,7 +68,8 @@ const SubscriptionCheckout = () => {
         'Unlimited playlists & images',
         'Static/animated images (jpg, png, webp, gif)',
         'Full HD resolution',
-        'Bug fixes & new features'
+        'Bug fixes & new features',
+        'Priority support'
       ]
     }
   };
@@ -116,16 +118,16 @@ const SubscriptionCheckout = () => {
   // If no valid plan is selected
   if (!planId || !planDetails[planId]) {
     return (
-      <div className="min-h-screen flex flex-col bg-gray-50">
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#060F33] to-[#061035]">
         <div className="flex-grow flex items-center justify-center">
-          <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
-            <h2 className="text-2xl font-bold text-red-600 mb-4">Error</h2>
-            <p className="text-gray-700">
+          <div className="bg-[#070D40] p-8 rounded-lg shadow-md max-w-md w-full border border-purple-700">
+            <h2 className="text-2xl font-bold text-red-400 mb-4">Error</h2>
+            <p className="text-purple-200">
               {error || 'Invalid subscription plan selected. Please go back and select a valid plan.'}
             </p>
             <button
               onClick={() => navigate('/')}
-              className="mt-6 w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+              className="mt-6 w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-md hover:from-purple-700 hover:to-pink-600"
             >
               Return Home
             </button>
@@ -140,71 +142,74 @@ const SubscriptionCheckout = () => {
   const isYearly = planId.endsWith('yearly');
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#060F33] to-[#061035]">
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
+      <nav className="bg-[#0B0B4B] shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <div className="w-8">
-                <img src={popstream} alt="POP STREAM" />
+              <div className="flex-shrink-0 flex items-center">
+                <div className="flex items-center">
+                  <a href="https://popstream.net/" className="w-24">
+                    <img src={popstream} alt="POP STREAM" />
+                  </a>
+                </div>
               </div>
-              <span className="ml-2 text-xl font-bold text-gray-800">POP STREAM</span>
             </div>
-            <div>
-              <h1 className="text-lg font-semibold text-gray-900">Subscription Checkout</h1>
+            <div className="flex items-center">
+              <h1 className="text-lg font-semibold text-white">Subscription Checkout</h1>
             </div>
           </div>
         </div>
-      </header>
+      </nav>
 
       {/* Main Content */}
-      <main className="flex-grow">
-        <div className="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <main className="flex-grow py-12">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Order Summary */}
-          <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+          <div className="bg-[#070D40] shadow-lg overflow-hidden sm:rounded-lg border border-purple-700">
             <div className="px-4 py-5 sm:px-6">
-              <h2 className="text-lg leading-6 font-medium text-gray-900">Order Summary</h2>
-              <p className="mt-1 max-w-2xl text-sm text-gray-500">
+              <h2 className="text-lg leading-6 font-medium text-white">Order Summary</h2>
+              <p className="mt-1 max-w-2xl text-sm text-purple-300">
                 Details of your subscription plan.
               </p>
             </div>
-            <div className="border-t border-gray-200">
+            <div className="border-t border-purple-700">
               <dl>
-                <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Plan Name</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                <div className="bg-[#080E45] px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <dt className="text-sm font-medium text-purple-300">Plan Name</dt>
+                  <dd className="mt-1 text-sm text-white sm:mt-0 sm:col-span-2">
                     {selectedPlan.name}
                   </dd>
                 </div>
-                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Subscription Price</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    <span className="font-bold">{selectedPlan.price}</span>
+                <div className="bg-[#070D40] px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <dt className="text-sm font-medium text-purple-300">Subscription Price</dt>
+                  <dd className="mt-1 text-sm text-white sm:mt-0 sm:col-span-2">
+                    <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">{selectedPlan.price}</span>
                     {isYearly && (
-                      <span className="ml-2 px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                      <span className="ml-2 px-2 py-1 text-xs font-medium bg-green-900 text-green-400 rounded-full border border-green-400">
                         Save {selectedPlan.savingsPercent}
                       </span>
                     )}
                   </dd>
                 </div>
-                <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Billing Period</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                <div className="bg-[#080E45] px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <dt className="text-sm font-medium text-purple-300">Billing Period</dt>
+                  <dd className="mt-1 text-sm text-white sm:mt-0 sm:col-span-2">
                     {selectedPlan.billingPeriod}
                   </dd>
                 </div>
-                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Features</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
+                <div className="bg-[#070D40] px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <dt className="text-sm font-medium text-purple-300">Features</dt>
+                  <dd className="mt-1 text-sm text-white sm:mt-0 sm:col-span-2">
+                    <ul className="border border-purple-700 rounded-md divide-y divide-purple-700">
                       {selectedPlan.features.map((feature, index) => (
                         <li key={index} className="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
                           <div className="w-0 flex-1 flex items-center">
-                            <svg className="flex-shrink-0 h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <svg className={`flex-shrink-0 h-5 w-5 ${isPro ? 'text-pink-400' : 'text-purple-400'}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                             </svg>
-                            <span className="ml-2 flex-1 w-0 truncate">{feature}</span>
+                            <span className="ml-2 flex-1 w-0 truncate text-purple-100">{feature}</span>
                           </div>
                         </li>
                       ))}
@@ -216,7 +221,7 @@ const SubscriptionCheckout = () => {
           </div>
 
           {/* Payment Notice */}
-          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-md p-4">
+          <div className="mt-6 bg-[#0A1456] border border-blue-800 rounded-md p-4">
             <div className="flex">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -224,7 +229,7 @@ const SubscriptionCheckout = () => {
                 </svg>
               </div>
               <div className="ml-3 flex-1 md:flex md:justify-between">
-                <p className="text-sm text-blue-700">
+                <p className="text-sm text-blue-300">
                   You will be redirected to Stripe's secure payment page to complete your purchase.
                 </p>
               </div>
@@ -233,7 +238,7 @@ const SubscriptionCheckout = () => {
 
           {/* Error Message */}
           {error && (
-            <div className="mt-6 bg-red-50 border border-red-200 rounded-md p-4">
+            <div className="mt-6 bg-red-900 bg-opacity-30 border border-red-500 rounded-md p-4">
               <div className="flex">
                 <div className="flex-shrink-0">
                   <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -241,7 +246,7 @@ const SubscriptionCheckout = () => {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm text-red-700">{error}</p>
+                  <p className="text-sm text-red-400">{error}</p>
                 </div>
               </div>
             </div>
@@ -251,7 +256,7 @@ const SubscriptionCheckout = () => {
           <div className="mt-8 flex justify-end">
             <button
               type="button"
-              className="mr-4 bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="mr-4 bg-[#080E45] py-2 px-4 border border-purple-500 rounded-md shadow-sm text-sm font-medium text-purple-300 hover:bg-[#0A1050] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
               onClick={handleCancel}
               disabled={loading}
             >
@@ -261,7 +266,7 @@ const SubscriptionCheckout = () => {
               type="button"
               className={`${
                 isPro 
-                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600' 
+                  ? 'bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600' 
                   : 'bg-purple-600 hover:bg-purple-700'
               } py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500`}
               onClick={handleCheckout}
@@ -284,25 +289,21 @@ const SubscriptionCheckout = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-8">
+      <footer className="bg-[#0B0B4F] text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="md:flex md:items-center md:justify-between">
-            <div className="flex justify-center md:justify-start">
-              <div className="flex items-center">
-                <div className="w-6">
-                  <img src={popstream} alt="POP STREAM" />
-                </div>
-                <span className="ml-2 text-base font-medium text-gray-800">POP STREAM</span>
+          <div className="md:flex md:items-center md:justify-center">
+            <div className="mt-8 md:mt-0">
+              <p className="text-center md:text-center">
+                &copy; {new Date().getFullYear()} {' '}
+                <a href="https://popstream.net/" className="w-8">
+                  POP STREAM.{' '}
+                </a>
+                All rights reserved.
+              </p>
+              <div className="mt-2 text-center text-sm text-purple-300">
+                <p>Your payment is securely processed by Stripe. We do not store your card details.</p>
               </div>
             </div>
-            <div className="mt-8 md:mt-0">
-              <p className="text-center md:text-right text-base text-gray-500">
-                &copy; {new Date().getFullYear()} POP STREAM. All rights reserved.
-              </p>
-            </div>
-          </div>
-          <div className="mt-4 text-center text-sm text-gray-500">
-            <p>Your payment is securely processed by Stripe. We do not store your card details.</p>
           </div>
         </div>
       </footer>
