@@ -57,11 +57,26 @@ const Home = () => {
 
   // Helper function to get subscription display text
   const getSubscriptionDisplayText = (sub) => {
-    if (sub === 'standard') return 'Monthly';
-    if (sub === 'standard_yearly') return 'Yearly';
-    if (sub === 'pro') return 'Monthly';
-    if (sub === 'pro_yearly') return 'Yearly';
+    if (sub === 'standard_monthly' || sub === '"standard_monthly"') return 'Monthly';
+    if (sub === 'standard_yearly' || sub === '"standard_yearly"') return 'Yearly';
+    if (sub === 'pro_monthly' || sub === '"pro_monthly"') return 'Monthly';
+    if (sub === 'pro_yearly' || sub === '"pro_yearly"') return 'Yearly';
     return '';
+  };
+
+  // Helper function to determine if user has a specific plan type
+  const hasStandardPlan = () => {
+    return subscription === 'standard_monthly' || 
+           subscription === '"standard_monthly"' || 
+           subscription === 'standard_yearly' || 
+           subscription === '"standard_yearly"';
+  };
+
+  const hasProPlan = () => {
+    return subscription === 'pro_monthly' || 
+           subscription === '"pro_monthly"' || 
+           subscription === 'pro_yearly' || 
+           subscription === '"pro_yearly"';
   };
 
   return (
@@ -119,6 +134,11 @@ const Home = () => {
           <p className="mt-6 text-xl md:text-2xl text-purple-200 max-w-3xl mx-auto">
             Choose the perfect subscription plan for your entertainment needs
           </p>
+          {isAuthenticated && subscription && subscription !== 'free' && (
+            <div className="mt-4 text-lg text-green-300">
+              Current Plan: {subscription.includes('standard') ? 'Standard' : 'Pro'} ({getSubscriptionDisplayText(subscription)})
+            </div>
+          )}
         </div>
       </div>
 
@@ -210,7 +230,7 @@ const Home = () => {
               </div>
 
               {/* Standard Plan - Combined Monthly/Yearly */}
-              <div className={`border-2 ${isAuthenticated && (subscription === 'standard' || subscription === 'standard_yearly') ? 'border-green-400' : 'border-purple-600'} rounded-xl shadow-lg p-6 bg-[#070D40] hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1`}>
+              <div className={`border-2 ${hasStandardPlan() ? 'border-green-400' : 'border-purple-600'} rounded-xl shadow-lg p-6 bg-[#070D40] hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1`}>
                 <div className="text-center">
                   <h3 className="text-2xl font-bold text-white">STANDARD</h3>
                   <div className="mt-4 flex flex-col items-center">
@@ -258,11 +278,11 @@ const Home = () => {
                     </li>
                   </ul>
                   <div className="mt-8 space-y-4">
-                    {isAuthenticated && (subscription === 'standard' || subscription === 'standard_yearly') ? (
+                    {hasStandardPlan() ? (
                       <span className="inline-block px-4 py-2 text-green-400 font-medium bg-green-900 bg-opacity-30 rounded-full border border-green-400">
-                        Current Plan ({subscription === 'standard' ? 'Monthly' : 'Yearly'})
+                        Current Plan ({getSubscriptionDisplayText(subscription)})
                       </span>
-                    ) : isAuthenticated && (subscription === 'pro' || subscription === 'pro_yearly') ? (
+                    ) : isAuthenticated && hasProPlan() ? (
                       <button
                         className="w-full px-4 py-2 text-gray-300 font-medium bg-gray-800 rounded-md hover:bg-gray-700 transition-colors duration-300"
                         onClick={() => showNotification("You're already subscribed to a higher plan")}
@@ -290,7 +310,7 @@ const Home = () => {
               </div>
 
               {/* Pro Plan - Combined Monthly/Yearly */}
-              <div className={`border-2 ${isAuthenticated && (subscription === 'pro' || subscription === 'pro_yearly') ? 'border-green-400' : 'border-pink-500'} rounded-xl shadow-lg p-6 bg-[#070D40] hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1 relative overflow-hidden`}>
+              <div className={`border-2 ${hasProPlan() ? 'border-green-400' : 'border-pink-500'} rounded-xl shadow-lg p-6 bg-[#070D40] hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1 relative overflow-hidden`}>
                 <div className="absolute -top-2 -right-12 transform rotate-45 bg-gradient-to-r from-purple-500 to-pink-500 text-white py-1 px-12 text-xs font-bold">
                   BEST VALUE
                 </div>
@@ -345,9 +365,9 @@ const Home = () => {
                     </li>
                   </ul>
                   <div className="mt-8 space-y-4">
-                    {isAuthenticated && (subscription === 'pro' || subscription === 'pro_yearly') ? (
+                    {hasProPlan() ? (
                       <span className="inline-block px-4 py-2 text-green-400 font-medium bg-green-900 bg-opacity-30 rounded-full border border-green-400">
-                        Current Plan ({subscription === 'pro' ? 'Monthly' : 'Yearly'})
+                        Current Plan ({getSubscriptionDisplayText(subscription)})
                       </span>
                     ) : (
                       <div className="space-y-3">
